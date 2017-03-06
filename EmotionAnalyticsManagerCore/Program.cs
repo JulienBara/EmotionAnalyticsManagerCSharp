@@ -10,6 +10,8 @@ namespace EmotionAnalyticsManagerCore
     {
         static void Main(string[] args)
         {
+            var ret = EmotionText.AnalyseEmotionText("Bonjour Monde !");
+            Console.WriteLine(ret);
         }
     }
 }
