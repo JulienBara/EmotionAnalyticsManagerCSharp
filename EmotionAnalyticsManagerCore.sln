@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmotionAnalyticsManagerCore", "EmotionAnalyticsManagerCore\EmotionAnalyticsManagerCore.csproj", "{06964E2D-9486-4193-86B5-92A4DEFC5D89}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmotionAnalyticsManagerTelegramBot", "EmotionAnalyticsManagerTelegramBot\EmotionAnalyticsManagerTelegramBot.csproj", "{E6C8181C-E5C3-4984-B78C-114763E87DB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{06964E2D-9486-4193-86B5-92A4DEFC5D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06964E2D-9486-4193-86B5-92A4DEFC5D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06964E2D-9486-4193-86B5-92A4DEFC5D89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6C8181C-E5C3-4984-B78C-114763E87DB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6C8181C-E5C3-4984-B78C-114763E87DB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6C8181C-E5C3-4984-B78C-114763E87DB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6C8181C-E5C3-4984-B78C-114763E87DB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
