@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EmotionAnalyticsManagerCore
 {
-    static class EmotionText
+    public static class EmotionText
     {
         public static string AnalyseEmotionText(string text)
         {
@@ -18,7 +18,7 @@ namespace EmotionAnalyticsManagerCore
             return display;
         }
 
-        public static string TranslateToEnglish(string text)
+        private static string TranslateToEnglish(string text)
         {
             var keyYandexPath = @".\keys\keyYandexTranslation";
             var keyYandexTranslation = System.IO.File.ReadAllLines(keyYandexPath)[0];
@@ -36,7 +36,7 @@ namespace EmotionAnalyticsManagerCore
             return yandexAnswerDto.text[0];
         }
 
-        public static string GetEmotionInEnglishText(string englishText)
+        private static string GetEmotionInEnglishText(string englishText)
         {
             var keyIbmPath = @".\keys\keyIbmWatsonTextToEmotion";
             var keyIbmEmotion = System.IO.File.ReadAllLines(keyIbmPath)[0];
