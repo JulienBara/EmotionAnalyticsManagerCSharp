@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -20,8 +22,7 @@ namespace EmotionAnalyticsManagerCore
 
         private static string TranslateToEnglish(string text)
         {
-            var keyYandexPath = @".\keys\keyYandexTranslation";
-            var keyYandexTranslation = System.IO.File.ReadAllLines(keyYandexPath)[0];
+            var keyYandexTranslation = ConfigurationManager.AppSettings["KeyYandexTranslation"];
 
             var url = "https://translate.yandex.net";
             var client = new RestClient(url);
@@ -38,8 +39,7 @@ namespace EmotionAnalyticsManagerCore
 
         private static string GetEmotionInEnglishText(string englishText)
         {
-            var keyIbmPath = @".\keys\keyIbmWatsonTextToEmotion";
-            var keyIbmEmotion = System.IO.File.ReadAllLines(keyIbmPath)[0];
+            var keyIbmEmotion = ConfigurationManager.AppSettings["KeyIbmWatsonTextToEmotion"];
 
             var url = "http://gateway-a.watsonplatform.net";
             var client = new RestClient(url);
@@ -58,11 +58,11 @@ namespace EmotionAnalyticsManagerCore
                 + docEmotions.joy
                 + docEmotions.sadness;
 
-            var display = "Colère = " + docEmotions.anger / sum + "\n"
-                + "Dégout = " + docEmotions.disgust / sum + "\n"
-                + "Peur = " + docEmotions.fear / sum + "\n"
-                + "Joie = " + docEmotions.joy / sum + "\n"
-                + "Tristesse = " + docEmotions.sadness / sum + "\n";
+            var display = "Colère = " + String.Format("{0:0.00}", docEmotions.anger / sum) + "\n"
+                + "Dégout = " + String.Format("{0:0.00}", docEmotions.disgust / sum ) + "\n"
+                + "Peur = " + String.Format("{0:0.00}", docEmotions.fear / sum ) + "\n"
+                + "Joie = " + String.Format("{0:0.00}", docEmotions.joy / sum ) + "\n"
+                + "Tristesse = " + String.Format("{0:0.00}", docEmotions.sadness / sum ) + "\n";
 
             return display;
         }

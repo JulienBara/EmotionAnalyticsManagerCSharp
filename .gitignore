@@ -241,3 +241,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /EmotionAnalyticsManagerCore/Keys.config
+/EmotionAnalyticsManagerTelegramBot/Keys.config
