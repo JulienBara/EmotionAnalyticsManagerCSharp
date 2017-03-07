@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using EmotionAnalyticsManagerCore;
 
 namespace EmotionAnalyticsManagerBotFW
 {
@@ -21,13 +22,21 @@ namespace EmotionAnalyticsManagerBotFW
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
+                var message = activity.Text ?? string.Empty;
 
-                // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                if (message.StartsWith("/emo"))
+                {
+                    ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                    var wordsArray = message.Split().Skip(1);
+                    var words = string.Join(" ", wordsArray);
+
+                    var answer = EmotionText.AnalyseEmotionText(words);
+
+                    // return our reply to the user
+                    Activity reply = activity.CreateReply(answer);
+                    await connector.Conversations.ReplyToActivityAsync(reply);
+                }
             }
             else
             {

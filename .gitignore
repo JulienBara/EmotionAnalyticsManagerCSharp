@@ -242,3 +242,5 @@ ModelManifest.xml
 .fake/
 /EmotionAnalyticsManagerCore/Keys.config
 /EmotionAnalyticsManagerTelegramBot/Keys.config
+/EmotionAnalyticsManagerRasp/Keys.config
+/EmotionAnalyticsManagerBotFW/Keys.config
