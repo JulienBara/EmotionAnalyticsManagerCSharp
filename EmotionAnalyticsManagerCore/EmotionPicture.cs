@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -34,11 +35,15 @@ namespace EmotionAnalyticsManagerCore
             using (var g = Graphics.FromImage(img))
             {
                 var color = Color.Green;
-                var pen = new Pen(color);
+                var pen = new Pen(color, img.Height / 100);
+                var fontFamily = new FontFamily("Arial");
+                var font = new Font(fontFamily, img.Height / 20, FontStyle.Regular,GraphicsUnit.Pixel);
+                var brush = new SolidBrush(color);
                 foreach (var emotion in emotions)
                 {
                     g.DrawRectangle(pen, emotion.faceRectangle.left, emotion.faceRectangle.top,
                         emotion.faceRectangle.width, emotion.faceRectangle.height);
+                    g.DrawString(GetMaxEmotion(emotion), font, brush, emotion.faceRectangle.left, emotion.faceRectangle.top - img.Height / 15);
                 }
             }
             var imgAnswer = ImageToByteArray(img);
@@ -85,6 +90,26 @@ namespace EmotionAnalyticsManagerCore
                 Image returnImage = Image.FromStream(ms);
                 return returnImage;
             }
+        }
+
+        private static string GetMaxEmotion(MicrosoftEmotionAnswerFaceDto emotion)
+        {
+            // TODO : Change class MicrosoftEmotionAnswerFaceDto to have a Dictionnary of emotions 
+
+            var emotions = new Dictionary<string, double>();
+            emotions.Add("anger", emotion.scores.anger);
+            emotions.Add("contempt", emotion.scores.contempt);
+            emotions.Add("disgust", emotion.scores.disgust);
+            emotions.Add("fear", emotion.scores.fear);
+            emotions.Add("happiness", emotion.scores.happiness);
+            emotions.Add("neutral", emotion.scores.neutral);
+            emotions.Add("sadness", emotion.scores.sadness);
+            emotions.Add("surprise", emotion.scores.surprise);
+
+            var maxEmotions = emotions.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotions[maxEmotions]);
+
+            return emotionString;
         }
     }
 }
