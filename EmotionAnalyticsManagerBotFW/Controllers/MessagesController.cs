@@ -37,6 +37,14 @@ namespace EmotionAnalyticsManagerBotFW
                     Activity reply = activity.CreateReply(answer);
                     await connector.Conversations.ReplyToActivityAsync(reply);
                 }
+
+                if (activity.Attachments.Count > 0)
+                {
+                    foreach (var attachement in activity.Attachments)
+                    {
+                        EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                    }
+                }
             }
             else
             {

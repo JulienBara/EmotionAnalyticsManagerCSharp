@@ -71,8 +71,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmotionPicture.cs" />
     <Compile Include="EmotionText.cs" />
     <Compile Include="IbmAnswerDto.cs" />
+    <Compile Include="MicrosoftEmotionAnswerFaceDto.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="YandexAnswerDto.cs" />
