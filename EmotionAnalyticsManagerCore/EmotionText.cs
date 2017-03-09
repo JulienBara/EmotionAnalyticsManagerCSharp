@@ -58,11 +58,11 @@ namespace EmotionAnalyticsManagerCore
                 + docEmotions.joy
                 + docEmotions.sadness;
 
-            var display = "Colère = " + String.Format("{0:0.00}", docEmotions.anger / sum) + "\n"
-                + "Dégout = " + String.Format("{0:0.00}", docEmotions.disgust / sum ) + "\n"
-                + "Peur = " + String.Format("{0:0.00}", docEmotions.fear / sum ) + "\n"
-                + "Joie = " + String.Format("{0:0.00}", docEmotions.joy / sum ) + "\n"
-                + "Tristesse = " + String.Format("{0:0.00}", docEmotions.sadness / sum ) + "\n";
+            var display = "Colère = " + String.Format("{0:0.00}", docEmotions.anger / sum) + "\n\n"
+                + "Dégout = " + String.Format("{0:0.00}", docEmotions.disgust / sum ) + "\n\n"
+                + "Peur = " + String.Format("{0:0.00}", docEmotions.fear / sum ) + "\n\n"
+                + "Joie = " + String.Format("{0:0.00}", docEmotions.joy / sum ) + "\n\n"
+                + "Tristesse = " + String.Format("{0:0.00}", docEmotions.sadness / sum );
 
             return display;
         }
