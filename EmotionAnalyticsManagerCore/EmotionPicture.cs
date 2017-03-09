@@ -32,7 +32,6 @@ namespace EmotionAnalyticsManagerCore
             request.RequestFormat = DataFormat.Json;
             request.AddBody(new { url = imageUrl });
 
-
             IRestResponse response = client.Execute(request);
             var emotions = JsonConvert.DeserializeObject<List<MicrosoftEmotionAnswerFaceDto>>(response.Content);
 
