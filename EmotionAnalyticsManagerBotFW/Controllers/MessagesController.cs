@@ -8,6 +8,7 @@ using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using EmotionAnalyticsManagerCore;
+using System.Collections.Generic;
 
 namespace EmotionAnalyticsManagerBotFW
 {
@@ -42,7 +43,17 @@ namespace EmotionAnalyticsManagerBotFW
                 {
                     foreach (var attachement in activity.Attachments)
                     {
-                        EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                        var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                        if (imageUrl != null)
+                        {
+                            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                            var answer = activity.CreateReply();
+                            answer.Attachments = new List<Attachment>();
+                            answer.Attachments.Add(new Attachment { ContentUrl = imageUrl, ContentType = "image/jpeg", Name = " " });
+
+                            await connector.Conversations.ReplyToActivityAsync(answer);
+                        }
                     }
                 }
             }

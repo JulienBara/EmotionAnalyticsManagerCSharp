@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RestSharp;
+using RestSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,11 +14,20 @@ namespace EmotionAnalyticsManagerCore
     {
         public static string AnalyseEmotionPicture(string imageUrl)
         {
-            //var image_local_path = DownloadPicture(imageUrl);
             var emotions = GetEmotionOfThePicture(imageUrl);
-            if (true) return null; // no faces
+            if (emotions.Count == 0) return null; // no faces
+            var image = DownloadPicture(imageUrl);
             //DrawEmotion(emotions, image_local_path);
-            //return image_local_path;
+            var imageUrlAnswer = UrlifyImage(image);
+            return imageUrlAnswer;
+        }
+
+        private static byte[] DownloadPicture(string imageUrl)
+        {
+            var client = new RestClient(imageUrl);
+            var request = new RestRequest();
+            var image = client.DownloadData(request);
+            return image;
         }
 
         private static List<MicrosoftEmotionAnswerFaceDto> GetEmotionOfThePicture(string imageUrl)
@@ -36,6 +46,12 @@ namespace EmotionAnalyticsManagerCore
             var emotions = JsonConvert.DeserializeObject<List<MicrosoftEmotionAnswerFaceDto>>(response.Content);
 
             return emotions;
+        }
+
+        private static string UrlifyImage(byte[] image)
+        {
+            string url = "data:image/png;base64," + Convert.ToBase64String(image);
+            return url;
         }
     }
 }
