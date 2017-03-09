@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json;
 using RestSharp;
-using RestSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
+using System.IO;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -17,8 +15,8 @@ namespace EmotionAnalyticsManagerCore
             var emotions = GetEmotionOfThePicture(imageUrl);
             if (emotions.Count == 0) return null; // no faces
             var image = DownloadPicture(imageUrl);
-            //DrawEmotion(emotions, image_local_path);
-            var imageUrlAnswer = UrlifyImage(image);
+            var imageEmotions = DrawEmotion(emotions, image);
+            var imageUrlAnswer = UrlifyImage(imageEmotions);
             return imageUrlAnswer;
         }
 
@@ -28,6 +26,23 @@ namespace EmotionAnalyticsManagerCore
             var request = new RestRequest();
             var image = client.DownloadData(request);
             return image;
+        }
+
+        private static byte[] DrawEmotion(List<MicrosoftEmotionAnswerFaceDto> emotions, byte[] image)
+        {
+            var img = ByteArrayToImage(image);
+            using (var g = Graphics.FromImage(img))
+            {
+                var color = Color.Green;
+                var pen = new Pen(color);
+                foreach (var emotion in emotions)
+                {
+                    g.DrawRectangle(pen, emotion.faceRectangle.left, emotion.faceRectangle.top,
+                        emotion.faceRectangle.width, emotion.faceRectangle.height);
+                }
+            }
+            var imgAnswer = ImageToByteArray(img);
+            return imgAnswer;
         }
 
         private static List<MicrosoftEmotionAnswerFaceDto> GetEmotionOfThePicture(string imageUrl)
@@ -52,6 +67,24 @@ namespace EmotionAnalyticsManagerCore
         {
             string url = "data:image/png;base64," + Convert.ToBase64String(image);
             return url;
+        }
+
+        private static byte[] ImageToByteArray(Image imageIn)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                imageIn.Save(ms, imageIn.RawFormat);
+                return ms.ToArray();
+            }
+        }
+
+        private static Image ByteArrayToImage(byte[] byteArrayIn)
+        {
+            using (MemoryStream ms = new MemoryStream(byteArrayIn))
+            {
+                Image returnImage = Image.FromStream(ms);
+                return returnImage;
+            }
         }
     }
 }
