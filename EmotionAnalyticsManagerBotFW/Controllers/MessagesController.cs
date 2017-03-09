@@ -39,7 +39,7 @@ namespace EmotionAnalyticsManagerBotFW
                     await connector.Conversations.ReplyToActivityAsync(reply);
                 }
 
-                if (activity.Attachments.Count > 0)
+                if (activity.Attachments != null)
                 {
                     foreach (var attachement in activity.Attachments)
                     {
