@@ -46,8 +46,9 @@ namespace EmotionAnalyticsManagerBotFW
                         // Telegram seems to convert most of pictures to JPEG
                         // Microsoft Api 13/03/2017:
                         // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
-                        if (attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
+                        if ((attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
                             attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
+                            && attachement.Name != null && attachement.Name.StartsWith("/emo"))
                         {
                             var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
                             if (imageUrl != null)
@@ -70,7 +71,7 @@ namespace EmotionAnalyticsManagerBotFW
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
-                                }   
+                                }
                             }
                         }
                     }
