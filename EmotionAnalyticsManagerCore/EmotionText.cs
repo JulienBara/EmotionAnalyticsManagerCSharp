@@ -52,17 +52,16 @@ namespace EmotionAnalyticsManagerCore
             var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
             var docEmotions = ibmAnswerDto.docEmotions;
 
-            var sum = docEmotions.anger
-                + docEmotions.disgust
-                + docEmotions.fear
-                + docEmotions.joy
-                + docEmotions.sadness;
+            var sum = docEmotions.Sum(x => x.Value);
 
-            var display = "Colère = " + string.Format("{0:0.00}", docEmotions.anger / sum) + "\n\n"
-                + "Dégout = " + string.Format("{0:0.00}", docEmotions.disgust / sum ) + "\n\n"
-                + "Peur = " + string.Format("{0:0.00}", docEmotions.fear / sum ) + "\n\n"
-                + "Joie = " + string.Format("{0:0.00}", docEmotions.joy / sum ) + "\n\n"
-                + "Tristesse = " + string.Format("{0:0.00}", docEmotions.sadness / sum );
+            var display = "";
+
+            var translation = new Translation();
+
+            foreach (var emotion in docEmotions)
+            {
+                display += translation.dictionary[emotion.Key] + " = " + string.Format("{0:0.00}", emotion.Value / sum) + "\n\n";
+            }
 
             return display;
         }
