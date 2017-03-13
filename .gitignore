@@ -244,3 +244,4 @@ ModelManifest.xml
 /EmotionAnalyticsManagerTelegramBot/Keys.config
 /EmotionAnalyticsManagerRasp/Keys.config
 /EmotionAnalyticsManagerBotFW/Keys.config
+EmotionAnalyticsManagerBotFW/Properties/PublishProfiles/Emo - Web Deploy.pubxml
