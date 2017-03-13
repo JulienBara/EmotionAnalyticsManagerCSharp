@@ -32,11 +32,14 @@ namespace EmotionAnalyticsManagerBotFW
                     var wordsArray = message.Split().Skip(1);
                     var words = string.Join(" ", wordsArray);
 
-                    var answer = EmotionText.AnalyseEmotionText(words);
+                    if (words != "")
+                    {
+                        var answer = EmotionText.AnalyseEmotionText(words);
 
-                    // return our reply to the user
-                    Activity reply = activity.CreateReply(answer);
-                    await connector.Conversations.ReplyToActivityAsync(reply);
+                        // return our reply to the user
+                        Activity reply = activity.CreateReply(answer);
+                        await connector.Conversations.ReplyToActivityAsync(reply);
+                    }
                 }
 
                 if (activity.Attachments != null)
