@@ -18,6 +18,8 @@ namespace EmotionAnalyticsManagerCore
             dictionary.Add("fear", "Peur");
             dictionary.Add("joy", "Joie");
             dictionary.Add("sadness", "Tristesse");
+            dictionary.Add("emotion", "Emotion");
+            dictionary.Add("value", "Valeur");
         }
     }
 }

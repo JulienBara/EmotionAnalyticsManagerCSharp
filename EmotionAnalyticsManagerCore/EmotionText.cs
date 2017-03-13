@@ -27,11 +27,11 @@ namespace EmotionAnalyticsManagerCore
             var url = "https://translate.yandex.net";
             var client = new RestClient(url);
             var request = new RestRequest("/api/v1.5/tr.json/translate", Method.POST);
-            request.AddParameter("key", keyYandexTranslation); 
-            request.AddParameter("lang", "en"); 
+            request.AddParameter("key", keyYandexTranslation);
+            request.AddParameter("lang", "en");
             request.AddParameter("text", text);
 
-            IRestResponse response = client.Execute(request);    
+            IRestResponse response = client.Execute(request);
             var yandexAnswerDto = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content);
 
             return yandexAnswerDto.text[0];
@@ -54,14 +54,22 @@ namespace EmotionAnalyticsManagerCore
 
             var sum = docEmotions.Sum(x => x.Value);
 
-            var display = "";
-
             var translation = new Translation();
+
+            var displayList = new List<string>();
+
+            displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
+                translation.dictionary["value"]));
+            displayList.Add("-|-");
 
             foreach (var emotion in docEmotions)
             {
-                display += translation.dictionary[emotion.Key] + " = " + string.Format("{0:0.00}", emotion.Value / sum) + "\n\n";
+                var emotionTranslated = translation.dictionary[emotion.Key];
+                var emotionValue = emotion.Value / sum;
+                displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
             }
+
+            var display = string.Join("\n", displayList);
 
             return display;
         }
