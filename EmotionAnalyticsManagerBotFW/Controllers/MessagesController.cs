@@ -43,16 +43,28 @@ namespace EmotionAnalyticsManagerBotFW
                 {
                     foreach (var attachement in activity.Attachments)
                     {
-                        var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
-                        if (imageUrl != null)
+                        // Telegram seems to convert most of pictures to JPEG
+                        // Microsoft Api 13/03/2017:
+                        // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
+                        if (attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
+                            attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
                         {
-                            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                            var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                            if (imageUrl != null)
+                            {
+                                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-                            var answer = activity.CreateReply();
-                            answer.Attachments = new List<Attachment>();
-                            answer.Attachments.Add(new Attachment { ContentUrl = imageUrl, ContentType = "image/jpeg", Name = " " });
+                                var answer = activity.CreateReply();
+                                answer.Attachments = new List<Attachment>();
+                                answer.Attachments.Add(new Attachment
+                                {
+                                    ContentUrl = imageUrl,
+                                    ContentType = "image/jpeg",
+                                    Name = " "
+                                });
 
-                            await connector.Conversations.ReplyToActivityAsync(answer);
+                                await connector.Conversations.ReplyToActivityAsync(answer);
+                            }
                         }
                     }
                 }
