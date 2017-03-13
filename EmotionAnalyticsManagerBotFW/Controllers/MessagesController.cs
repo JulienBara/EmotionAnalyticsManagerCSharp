@@ -63,7 +63,14 @@ namespace EmotionAnalyticsManagerBotFW
                                     Name = " "
                                 });
 
-                                await connector.Conversations.ReplyToActivityAsync(answer);
+                                try
+                                {
+                                    await connector.Conversations.ReplyToActivityAsync(answer);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                }   
                             }
                         }
                     }

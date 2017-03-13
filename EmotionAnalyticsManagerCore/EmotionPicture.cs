@@ -74,7 +74,7 @@ namespace EmotionAnalyticsManagerCore
 
         private static string UrlifyImage(byte[] image)
         {
-            string url = "data:image/png;base64," + Convert.ToBase64String(image);
+            string url = "data:image/jpg;base64," + Convert.ToBase64String(image);
             return url;
         }
 
