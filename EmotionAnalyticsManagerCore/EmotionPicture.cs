@@ -98,20 +98,8 @@ namespace EmotionAnalyticsManagerCore
 
         private static string GetMaxEmotion(MicrosoftEmotionAnswerFaceDto emotion)
         {
-            // TODO : Change class MicrosoftEmotionAnswerFaceDto to have a Dictionnary of emotions 
-
-            var emotions = new Dictionary<string, double>();
-            emotions.Add("anger", emotion.scores.anger);
-            emotions.Add("contempt", emotion.scores.contempt);
-            emotions.Add("disgust", emotion.scores.disgust);
-            emotions.Add("fear", emotion.scores.fear);
-            emotions.Add("happiness", emotion.scores.happiness);
-            emotions.Add("neutral", emotion.scores.neutral);
-            emotions.Add("sadness", emotion.scores.sadness);
-            emotions.Add("surprise", emotion.scores.surprise);
-
-            var maxEmotions = emotions.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotions[maxEmotions]);
+            var maxEmotions = emotion.scores.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotion.scores[maxEmotions]);
 
             return emotionString;
         }
