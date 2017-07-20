@@ -36,15 +36,15 @@ namespace EmotionAnalyticsManagerBotFW
                     if (words != "")
                     {
                         var answer = "";
-                        //try
-                        //{
+                        try
+                        {
                             answer = EmotionText.AnalyseEmotionText(words);
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    var telemetryClient = new TelemetryClient();
-                        //    telemetryClient.TrackException(ex);
-                        //}
+                        }
+                        catch (Exception ex)
+                        {
+                            var telemetryClient = new TelemetryClient();
+                            telemetryClient.TrackException(ex);
+                        }
 
                         // return our reply to the user
                         Activity reply = activity.CreateReply(answer);
