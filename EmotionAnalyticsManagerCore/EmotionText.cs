@@ -39,11 +39,21 @@ namespace EmotionAnalyticsManagerCore
 
         private static string GetEmotionInEnglishText(string englishText)
         {
-            var keyIbmEmotion = ConfigurationManager.AppSettings["KeyIbmWatsonTextToEmotion"];
+            // var keyIbmEmotion = ConfigurationManager.AppSettings["KeyIbmWatsonTextToEmotion"];
+            var ibmEmotionUsername = ConfigurationManager.AppSettings["IbmEmotionUsername"];
+            var ibmEmotionPassword = ConfigurationManager.AppSettings["IbmEmotionPassword"];
 
-            var url = "http://gateway-a.watsonplatform.net";
+            // var url = "http://gateway-a.watsonplatform.net";
+            // var client = new RestClient(url);
+            // var request = new RestRequest("/calls/text/TextGetEmotion", Method.POST);
+            // request.AddParameter("apikey", keyIbmEmotion);
+            // request.AddParameter("text", englishText);
+            // request.AddParameter("outputMode", "json");
+            var url = "https://gateway.watsonplatform.net";
             var client = new RestClient(url);
-            var request = new RestRequest("/calls/text/TextGetEmotion", Method.POST);
+            client.Authenticator = new SimpleAuthenticator("username", ibmEmotionUsername, "password", ibmEmotionPassword);
+            
+            var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27", Method.POST);
             request.AddParameter("apikey", keyIbmEmotion);
             request.AddParameter("text", englishText);
             request.AddParameter("outputMode", "json");
