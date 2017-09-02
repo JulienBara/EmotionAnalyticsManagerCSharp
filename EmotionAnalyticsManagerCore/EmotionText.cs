@@ -54,9 +54,7 @@ namespace EmotionAnalyticsManagerCore
             client.Authenticator = new SimpleAuthenticator("username", ibmEmotionUsername, "password", ibmEmotionPassword);
             
             var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27", Method.POST);
-            request.AddParameter("apikey", keyIbmEmotion);
-            request.AddParameter("text", englishText);
-            request.AddParameter("outputMode", "json");
+            request.AddParameter("Content-Type", "application/json");
 
             IRestResponse response = client.Execute(request);
             var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
