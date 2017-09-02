@@ -8,10 +8,24 @@ namespace EmotionAnalyticsManagerCore
 {
     class IbmAnswerDto
     {
-        public string status;
-        public string usage;
-        public int totalTransactions;
+        // public string status;
+        // public string usage;
+        // public int totalTransactions;
+        // public string language;
+        // public Dictionary<string,double> docEmotions;
+        
+        public Dictionary<string,double> usage;
         public string language;
-        public Dictionary<string,double> docEmotions;
+        public IbmAnswerEmotionDto emotion;
+    }
+    
+    class IbmAnswerEmotionDto
+    {
+        public IbmAnswerEmotionDocumentDto document;
+    }
+    
+    class IbmAnswerEmotionDocumentDto
+    {
+        public Dictionary<string,double> emotion;
     }
 }
