@@ -52,7 +52,7 @@ namespace EmotionAnalyticsManagerCore
             // request.AddParameter("outputMode", "json");
             var url = "https://gateway.watsonplatform.net";
             var client = new RestClient(url);
-            client.Authenticator = new SimpleAuthenticator("username", ibmEmotionUsername, "password", ibmEmotionPassword);
+            client.Authenticator = new HttpBasicAuthenticator(ibmEmotionUsername, ibmEmotionPassword);
             
             var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27", Method.POST);
             request.AddParameter("Content-Type", "application/json");
