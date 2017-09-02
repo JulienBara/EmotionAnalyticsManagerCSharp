@@ -59,7 +59,8 @@ namespace EmotionAnalyticsManagerCore
 
             IRestResponse response = client.Execute(request);
             var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
-            var docEmotions = ibmAnswerDto.docEmotions;
+            // var docEmotions = ibmAnswerDto.docEmotions;
+            var docEmotions = ibmAnswerDto.emotion.document.emotion;
 
             var sum = docEmotions.Sum(x => x.Value);
 
