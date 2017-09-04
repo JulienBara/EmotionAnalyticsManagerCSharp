@@ -84,7 +84,8 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine(e);
+                                var telemetryClient = new TelemetryClient();
+                                telemetryClient.TrackException(e);
                             }
                         }
                     }
