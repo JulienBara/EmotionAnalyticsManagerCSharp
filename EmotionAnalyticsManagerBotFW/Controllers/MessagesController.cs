@@ -24,31 +24,6 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
             {
                 var message = activity.Text ?? string.Empty;
 
-                //if (message ==  "/emo")
-                //{
-                //    ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                //    var prevActivity = await connector.Conversations.GetActivityMembersWithHttpMessagesAsync(activity.Conversation.Id, activity.ReplyToId);
-                //    var prevActivityMessage = prevActivity.Response.Content.ToString();
-                //    if (prevActivityMessage != "")
-                //    {
-                //        var answer = "";
-                //        try
-                //        {
-                //            answer = EmotionText.AnalyseEmotionText(prevActivityMessage);
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            var telemetryClient = new TelemetryClient();
-                //            telemetryClient.TrackException(ex);
-                //        }
-
-                //        // return our reply to the user
-                //        Activity reply = activity.CreateReply(answer);
-                        
-                //        await connector.Conversations.ReplyToActivityAsync(reply);
-                //    }
-                //}
-
                 if (message.StartsWith("/emo "))
                 {
                     ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
