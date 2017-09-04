@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -10,15 +6,15 @@ namespace EmotionAnalyticsManagerCore
     {
         public Dictionary<string,double> usage;
         public string language;
-        public IbmAnswerEmotionDto emotion;
+        public EmotionDto emotion;
     }
     
-    class IbmAnswerEmotionDto
+    class EmotionDto
     {
-        public IbmAnswerEmotionDocumentDto document;
+        public DocumentDto document;
     }
     
-    class IbmAnswerEmotionDocumentDto
+    class DocumentDto
     {
         public Dictionary<string,double> emotion;
     }

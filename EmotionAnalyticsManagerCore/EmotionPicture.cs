@@ -36,9 +36,9 @@ namespace EmotionAnalyticsManagerCore
             using (var g = Graphics.FromImage(img))
             {
                 var color = Color.Green;
-                var pen = new Pen(color, img.Height / 100);
+                var pen = new Pen(color, (float)img.Height / 100);
                 var fontFamily = new FontFamily("Arial");
-                var font = new Font(fontFamily, img.Height / 20, FontStyle.Regular,GraphicsUnit.Pixel);
+                var font = new Font(fontFamily, (float)img.Height / 20, FontStyle.Regular,GraphicsUnit.Pixel);
                 var brush = new SolidBrush(color);
                 foreach (var emotion in emotions)
                 {
