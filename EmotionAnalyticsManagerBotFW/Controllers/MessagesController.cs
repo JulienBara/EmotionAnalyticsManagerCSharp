@@ -31,15 +31,12 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
 
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-                var wordsArray = message.Split().Skip(1);
-                var words = string.Join(" ", wordsArray);
-
-                if (words != "")
+                if (message != "")
                 {
                     var answer = "";
                     try
                     {
-                        answer = EmotionText.AnalyseEmotionText(words);
+                        answer = EmotionText.AnalyseEmotionText(message);
                     }
                     catch (Exception ex)
                     {
