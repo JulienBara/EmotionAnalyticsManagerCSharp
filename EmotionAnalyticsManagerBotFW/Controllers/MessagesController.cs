@@ -25,73 +25,75 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
                 var message = activity.Text ?? string.Empty;
 
                 if (message.StartsWith("/emo@EmotionsAnalyticManagerbot "))
-                { 
-                    ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
-                    var wordsArray = message.Split().Skip(1);
-                    var words = string.Join(" ", wordsArray);
-
-                    if (words != "")
-                    {
-                        var answer = "";
-                        try
-                        {
-                            answer = EmotionText.AnalyseEmotionText(words);
-                        }
-                        catch (Exception ex)
-                        {
-                            var telemetryClient = new TelemetryClient();
-                            telemetryClient.TrackException(ex);
-                        }
-
-                        // return our reply to the user
-                        Activity reply = activity.CreateReply(answer);
-                        await connector.Conversations.ReplyToActivityAsync(reply);
-                    }
+                {
+                    message = message.Skip("/emo@EmotionsAnalyticManagerbot ".Length).ToString();
                 }
 
-                if (activity.Attachments != null)
+                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                var wordsArray = message.Split().Skip(1);
+                var words = string.Join(" ", wordsArray);
+
+                if (words != "")
                 {
-                    foreach (var attachement in activity.Attachments)
+                    var answer = "";
+                    try
                     {
-                        // Telegram seems to convert most of pictures to JPEG
-                        // Microsoft Api 13/03/2017:
-                        // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
-                        if ((attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
-                            attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
-                            && attachement.Name != null && attachement.Name.StartsWith("/emo"))
-                        {
-                            var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
-                            if (imageUrl != null)
-                            {
-                                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
-                                var answer = activity.CreateReply();
-                                answer.Attachments = new List<Attachment>();
-                                answer.Attachments.Add(new Attachment
-                                {
-                                    ContentUrl = imageUrl,
-                                    ContentType = "image/jpeg",
-                                    Name = " "
-                                });
-
-                                try
-                                {
-                                    await connector.Conversations.ReplyToActivityAsync(answer);
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine(e);
-                                }
-                            }
-                        }
+                        answer = EmotionText.AnalyseEmotionText(words);
                     }
+                    catch (Exception ex)
+                    {
+                        var telemetryClient = new TelemetryClient();
+                        telemetryClient.TrackException(ex);
+                    }
+
+                    // return our reply to the user
+                    Activity reply = activity.CreateReply(answer);
+                    await connector.Conversations.ReplyToActivityAsync(reply);
                 }
             }
             else
             {
                 HandleSystemMessage(activity);
             }
+
+            if (activity.Attachments != null)
+            {
+                foreach (var attachement in activity.Attachments)
+                {
+                    // Telegram seems to convert most of pictures to JPEG
+                    // Microsoft Api 13/03/2017:
+                    // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
+                    if (attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
+                        attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
+                    {
+                        var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                        if (imageUrl != null)
+                        {
+                            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                            var answer = activity.CreateReply();
+                            answer.Attachments = new List<Attachment>();
+                            answer.Attachments.Add(new Attachment
+                            {
+                                ContentUrl = imageUrl,
+                                ContentType = "image/jpeg",
+                                Name = " "
+                            });
+
+                            try
+                            {
+                                await connector.Conversations.ReplyToActivityAsync(answer);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
+                        }
+                    }
+                }
+            }
+
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
