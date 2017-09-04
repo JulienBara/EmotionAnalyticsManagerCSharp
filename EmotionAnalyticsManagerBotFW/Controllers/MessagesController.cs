@@ -24,9 +24,7 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
             {
                 var message = activity.Text ?? string.Empty;
 
-                //if (message.StartsWith("/emo "))
-                //{
-                if (message != string.Empty)
+                if (message.StartsWith("/emo@EmotionsAnalyticManagerbot  "))
                 { 
                     ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
