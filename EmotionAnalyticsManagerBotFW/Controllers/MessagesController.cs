@@ -22,32 +22,7 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                var message = activity.Text ?? string.Empty;
-
-                if (message.StartsWith("/emo@EmotionsAnalyticManagerbot "))
-                {
-                    message = message.Skip("/emo@EmotionsAnalyticManagerbot ".Length).ToString();
-                }
-
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
-                if (message != "")
-                {
-                    var answer = "";
-                    try
-                    {
-                        answer = EmotionText.AnalyseEmotionText(message);
-                    }
-                    catch (Exception ex)
-                    {
-                        var telemetryClient = new TelemetryClient();
-                        telemetryClient.TrackException(ex);
-                    }
-
-                    // return our reply to the user
-                    Activity reply = activity.CreateReply(answer);
-                    await connector.Conversations.ReplyToActivityAsync(reply);
-                }
+                Task.Run(async () => EmotionTextAsync(activity));
             }
             else
             {
@@ -56,40 +31,7 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
 
             if (activity.Attachments != null)
             {
-                foreach (var attachement in activity.Attachments)
-                {
-                    // Telegram seems to convert most of pictures to JPEG
-                    // Microsoft Api 13/03/2017:
-                    // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
-                    if (attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
-                        attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
-                    {
-                        var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
-                        if (imageUrl != null)
-                        {
-                            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
-                            var answer = activity.CreateReply();
-                            answer.Attachments = new List<Attachment>();
-                            answer.Attachments.Add(new Attachment
-                            {
-                                ContentUrl = imageUrl,
-                                ContentType = "image/jpeg",
-                                Name = " "
-                            });
-
-                            try
-                            {
-                                await connector.Conversations.ReplyToActivityAsync(answer);
-                            }
-                            catch (Exception e)
-                            {
-                                var telemetryClient = new TelemetryClient();
-                                telemetryClient.TrackException(e);
-                            }
-                        }
-                    }
-                }
+                Task.Run(async () => EmotionImageAsync(activity));
             }
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -123,6 +65,76 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
             }
 
             return null;
+        }
+
+        private static async void EmotionTextAsync(Activity activity)
+        {
+            var message = activity.Text ?? string.Empty;
+
+            var emoString = "/emo@EmotionsAnalyticManagerbot ";
+
+            if (message.StartsWith(emoString))
+            {
+                message = message.Skip(emoString.Length).ToString();
+            }
+
+            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+            if (message != "")
+            {
+                var answer = "";
+                try
+                {
+                    answer = EmotionText.AnalyseEmotionText(message);
+                }
+                catch (Exception ex)
+                {
+                    var telemetryClient = new TelemetryClient();
+                    telemetryClient.TrackException(ex);
+                }
+
+                // return our reply to the user
+                Activity reply = activity.CreateReply(answer);
+                await connector.Conversations.ReplyToActivityAsync(reply);
+            }
+        }
+
+        private static async void EmotionImageAsync(Activity activity)
+        {
+            foreach (var attachement in activity.Attachments)
+            {
+                // Telegram seems to convert most of pictures to JPEG
+                // Microsoft Api 13/03/2017:
+                // "The supported input image formats includes JPEG, PNG, GIF(the first frame), BMP. Image file size should be no larger than 4MB."
+                if (attachement.ContentType == "image/jpeg" || attachement.ContentType == "image/png" ||
+                    attachement.ContentType == "image/gif" || attachement.ContentType == "image/bmp")
+                {
+                    var imageUrl = EmotionPicture.AnalyseEmotionPicture(attachement.ContentUrl);
+                    if (imageUrl != null)
+                    {
+                        ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                        var answer = activity.CreateReply();
+                        answer.Attachments = new List<Attachment>();
+                        answer.Attachments.Add(new Attachment
+                        {
+                            ContentUrl = imageUrl,
+                            ContentType = "image/jpeg",
+                            Name = " "
+                        });
+
+                        try
+                        {
+                            await connector.Conversations.ReplyToActivityAsync(answer);
+                        }
+                        catch (Exception e)
+                        {
+                            var telemetryClient = new TelemetryClient();
+                            telemetryClient.TrackException(e);
+                        }
+                    }
+                }
+            }
         }
     }
 }
