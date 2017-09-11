@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
+using Microsoft.ApplicationInsights;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -54,8 +56,27 @@ namespace EmotionAnalyticsManagerCore
                 }
             };
             request.AddJsonBody(body);
-           
-            IRestResponse response = client.Execute(request);
+
+            IRestResponse response = null;
+
+            try
+            {
+                response = client.Execute(request);
+            }
+            catch (Exception ex)
+            {
+                var properties = new Dictionary<string, string>()
+                {
+                    { "text", englishText },
+                    { "response status", response.ResponseStatus.ToString() },
+                    { "content", response.Content.ToString() }
+                };
+
+                var telemetryClient = new TelemetryClient();
+                telemetryClient.TrackException(ex, properties);
+                throw ex;
+            }
+            
             var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
 
             var docEmotions = ibmAnswerDto.emotion.document.emotion;
