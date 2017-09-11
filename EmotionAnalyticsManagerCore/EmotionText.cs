@@ -1,5 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 using System.Collections.Generic;
@@ -66,56 +65,39 @@ namespace EmotionAnalyticsManagerCore
             };
             request.AddJsonBody(body);
 
-            IRestResponse response = null;
+            IRestResponse response = client.Execute(request);
 
-            try
+            var telemetryClient = new TelemetryClient();
+            telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
             {
-                response = client.Execute(request);
+                {"request text", englishText},
+                {"response content", response.Content}
+            });
 
-                var telemetryClient = new TelemetryClient();
-                telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
-                {
-                    {"request text", englishText},
-                    {"response content", response.Content}
-                });
+            var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
 
-                var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
+            var docEmotions = ibmAnswerDto.emotion.document.emotion;
 
-                var docEmotions = ibmAnswerDto.emotion.document.emotion;
+            var sum = docEmotions.Sum(x => x.Value);
 
-                var sum = docEmotions.Sum(x => x.Value);
+            var translation = new Translation();
 
-                var translation = new Translation();
+            var displayList = new List<string>();
 
-                var displayList = new List<string>();
+            displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
+                translation.dictionary["value"]));
+            displayList.Add("-|-");
 
-                displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
-                    translation.dictionary["value"]));
-                displayList.Add("-|-");
-
-                foreach (var emotion in docEmotions)
-                {
-                    var emotionTranslated = translation.dictionary[emotion.Key];
-                    var emotionValue = emotion.Value / sum;
-                    displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
-                }
-
-                var display = string.Join("\n", displayList);
-
-                return display;
-            }
-            catch (Exception ex)
+            foreach (var emotion in docEmotions)
             {
-                var properties = new Dictionary<string, string>()
-                {
-                    {"response", response.Content},
-                    {"request", body.ToString()}     
-                };
-
-                var telemetryClient = new TelemetryClient();
-                telemetryClient.TrackException(ex, properties);
-                throw ex;
+                var emotionTranslated = translation.dictionary[emotion.Key];
+                var emotionValue = emotion.Value / sum;
+                displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
             }
+
+            var display = string.Join("\n", displayList);
+
+            return display;
         }
     }
 }
