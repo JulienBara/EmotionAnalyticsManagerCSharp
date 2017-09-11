@@ -93,9 +93,8 @@ namespace EmotionAnalyticsManagerCore
             {
                 var properties = new Dictionary<string, string>()
                 {
-                    {"text", englishText.ToString()},
-                    {"response status", response.ResponseStatus.ToString()},
-                    {"content", response.Content}
+                    {"request", response.Request.ToString()},
+                    {"response", response.Content}
                 };
 
                 var telemetryClient = new TelemetryClient();
