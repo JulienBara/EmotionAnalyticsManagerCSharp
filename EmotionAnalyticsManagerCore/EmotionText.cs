@@ -93,7 +93,7 @@ namespace EmotionAnalyticsManagerCore
             {
                 var properties = new Dictionary<string, string>()
                 {
-                    {"request", response.Request.ToString()},
+                    {"request", body.ToString()},
                     {"response", response.Content}
                 };
 
