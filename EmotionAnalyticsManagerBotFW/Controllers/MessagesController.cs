@@ -75,7 +75,8 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
 
             if (message.StartsWith(emoString))
             {
-                message = message.Skip(emoString.Length).ToString();
+                //message = message.Skip(emoString.Length).ToString();
+                message = message.Substring(emoString.Length);
             }
 
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
