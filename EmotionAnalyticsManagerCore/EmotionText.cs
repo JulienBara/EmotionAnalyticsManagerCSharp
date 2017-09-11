@@ -39,12 +39,13 @@ namespace EmotionAnalyticsManagerCore
         {
             var ibmEmotionUsername = ConfigurationManager.AppSettings["IbmEmotionUsername"];
             var ibmEmotionPassword = ConfigurationManager.AppSettings["IbmEmotionPassword"];
-            
+
             var url = "https://gateway.watsonplatform.net";
             var client = new RestClient(url);
             client.Authenticator = new HttpBasicAuthenticator(ibmEmotionUsername, ibmEmotionPassword);
-            
-            var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27", Method.POST);
+
+            var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27",
+                Method.POST);
             request.AddHeader("Content-Type", "application/json");
 
             var body = new
@@ -62,45 +63,45 @@ namespace EmotionAnalyticsManagerCore
             try
             {
                 response = client.Execute(request);
+
+                var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
+
+                var docEmotions = ibmAnswerDto.emotion.document.emotion;
+
+                var sum = docEmotions.Sum(x => x.Value);
+
+                var translation = new Translation();
+
+                var displayList = new List<string>();
+
+                displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
+                    translation.dictionary["value"]));
+                displayList.Add("-|-");
+
+                foreach (var emotion in docEmotions)
+                {
+                    var emotionTranslated = translation.dictionary[emotion.Key];
+                    var emotionValue = emotion.Value / sum;
+                    displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
+                }
+
+                var display = string.Join("\n", displayList);
+
+                return display;
             }
             catch (Exception ex)
             {
                 var properties = new Dictionary<string, string>()
                 {
-                    { "text", englishText },
-                    { "response status", response.ResponseStatus.ToString() },
-                    { "content", response.Content.ToString() }
+                    {"text", englishText},
+                    {"response status", response.ResponseStatus.ToString()},
+                    {"content", response.Content}
                 };
 
                 var telemetryClient = new TelemetryClient();
                 telemetryClient.TrackException(ex, properties);
                 throw ex;
             }
-            
-            var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
-
-            var docEmotions = ibmAnswerDto.emotion.document.emotion;
-
-            var sum = docEmotions.Sum(x => x.Value);
-
-            var translation = new Translation();
-
-            var displayList = new List<string>();
-
-            displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
-                translation.dictionary["value"]));
-            displayList.Add("-|-");
-
-            foreach (var emotion in docEmotions)
-            {
-                var emotionTranslated = translation.dictionary[emotion.Key];
-                var emotionValue = emotion.Value / sum;
-                displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
-            }
-
-            var display = string.Join("\n", displayList);
-
-            return display;
         }
     }
 }
