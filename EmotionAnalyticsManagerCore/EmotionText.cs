@@ -30,6 +30,14 @@ namespace EmotionAnalyticsManagerCore
             request.AddParameter("text", text);
 
             IRestResponse response = client.Execute(request);
+
+            var telemetryClient = new TelemetryClient();
+            telemetryClient.TrackEvent("Translation Request", new Dictionary<string, string>
+            {
+                {"request text", text},
+                {"response content", response.Content}
+            });
+
             var yandexAnswerDto = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content);
 
             return yandexAnswerDto.text[0];
@@ -64,6 +72,13 @@ namespace EmotionAnalyticsManagerCore
             {
                 response = client.Execute(request);
 
+                var telemetryClient = new TelemetryClient();
+                telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
+                {
+                    {"request text", englishText},
+                    {"response content", response.Content}
+                });
+
                 var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
 
                 var docEmotions = ibmAnswerDto.emotion.document.emotion;
@@ -93,8 +108,8 @@ namespace EmotionAnalyticsManagerCore
             {
                 var properties = new Dictionary<string, string>()
                 {
-                    {"request", body.ToString()},
-                    {"response", response.Content}
+                    {"response", response.Content},
+                    {"request", body.ToString()}     
                 };
 
                 var telemetryClient = new TelemetryClient();
