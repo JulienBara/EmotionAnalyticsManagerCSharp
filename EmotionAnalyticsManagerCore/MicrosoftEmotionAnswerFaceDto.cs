@@ -5,7 +5,7 @@ namespace EmotionAnalyticsManagerCore
     class MicrosoftEmotionAnswerFaceDto
     {
         public FaceRectangle faceRectangle;
-        public Dictionary<string, double> scores;
+        public FaceAttributes faceAttributes;
     }
 
     class FaceRectangle
@@ -14,5 +14,10 @@ namespace EmotionAnalyticsManagerCore
         public int left;
         public int top;
         public int width;
+    }
+
+    class FaceAttributes
+    {
+        public Dictionary<string, double> emotion;
     }
 }

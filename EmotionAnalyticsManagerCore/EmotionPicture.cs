@@ -57,7 +57,7 @@ namespace EmotionAnalyticsManagerCore
 
             var url = "https://westus.api.cognitive.microsoft.com";
             var client = new RestClient(url);
-            var request = new RestRequest("/emotion/v1.0/recognize", Method.POST);
+            var request = new RestRequest("/face/v1.0/detect?returnFaceAttributes=emotion", Method.POST);
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Ocp-Apim-Subscription-Key", keyMicrosoftEmotion);
             request.RequestFormat = DataFormat.Json;
@@ -98,8 +98,8 @@ namespace EmotionAnalyticsManagerCore
 
         private static string GetMaxEmotion(MicrosoftEmotionAnswerFaceDto emotion)
         {
-            var maxEmotions = emotion.scores.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotion.scores[maxEmotions]);
+            var maxEmotions = emotion.faceAttributes.emotion.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotion.faceAttributes.emotion[maxEmotions]);
 
             return emotionString;
         }
