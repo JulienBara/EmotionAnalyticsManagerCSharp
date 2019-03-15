@@ -132,6 +132,12 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
                             telemetryClient.TrackException(e);
                         }
                     }
+                    else
+                    {
+                        Activity reply = activity.CreateReply("No face found.");
+                        ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                        await connector.Conversations.ReplyToActivityAsync(reply);
+                    }
                 }
             }
         }
