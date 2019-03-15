@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace EmotionAnalyticsManagerCore
 {
@@ -14,9 +15,12 @@ namespace EmotionAnalyticsManagerCore
     {
         public static string AnalyseEmotionPicture(string imageUrl)
         {
-            var emotions = GetEmotionOfThePicture(imageUrl);
+            var emotionsTask = Task.Run(() => GetEmotionOfThePicture(imageUrl));
+            var imageTask = Task.Run(() => DownloadPicture(imageUrl));
+
+            var emotions = emotionsTask.Result;
+            var image = imageTask.Result;
             if (emotions.Count == 0) return null; // no faces
-            var image = DownloadPicture(imageUrl);
             var imageEmotions = DrawEmotion(emotions, image);
             var imageUrlAnswer = UrlifyImage(imageEmotions);
             return imageUrlAnswer;

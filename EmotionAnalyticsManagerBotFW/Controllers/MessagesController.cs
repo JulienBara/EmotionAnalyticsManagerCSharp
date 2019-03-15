@@ -21,7 +21,7 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                Task.Run(async () => EmotionTextAsync(activity));
+                Task.Run(() => EmotionTextAsync(activity));
             }
             else
             {
@@ -30,7 +30,7 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
 
             if (activity.Attachments != null)
             {
-                Task.Run(async () => EmotionImageAsync(activity));
+                Task.Run(() => EmotionImageAsync(activity));
             }
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
