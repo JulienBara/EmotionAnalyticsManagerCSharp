@@ -58,6 +58,7 @@ namespace EmotionAnalyticManagerCoreStandard
         {
             using (Image<Rgba32> image = Image.Load(imageBytes))
             {
+                // todo
                 // For production application we would recommend you create a FontCollection
                 // singleton and manually install the ttf fonts yourself as using SystemFonts
                 // can be expensive and you risk font existing or not existing on a deployment
@@ -85,9 +86,10 @@ namespace EmotionAnalyticManagerCoreStandard
 
         private List<MicrosoftEmotionAnswerFaceDto> GetEmotionOfThePicture(string imageUrl)
         {
-            // todo check if there is a library or inject http inject
+            // todo check if there is a library or inject http client
+            var url = "https://westus.api.cognitive.microsoft.com";
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(@"https://westus.api.cognitive.microsoft.com");
+            client.BaseAddress = new Uri(url);
             client.DefaultRequestHeaders.Add("Content-Type", "application/json");
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _azureCognitiveServicesKey);
 

@@ -1,57 +1,63 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.ApplicationInsights;
-using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
-namespace EmotionAnalyticManagerCore
+namespace EmotionAnalyticManagerCoreStandard
 {
     public class EmotionText
     {
+        private readonly string _ibmEmotionUsername;
+        private readonly string _ibmEmotionPassword;
+    
+        private readonly string _yandexTranslationKey;
 
-        private readonly IConfiguration _configuration;
-
-        public EmotionText(IConfiguration configuration)
+        public EmotionText(
+            string ibmEmotionUsername,
+            string ibmEmotionPassword,
+            string yandexTranslationKey)
         {
-            _configuration = configuration
+            _ibmEmotionUsername = ibmEmotionUsername;
+            _ibmEmotionPassword = ibmEmotionPassword;
+            _yandexTranslationKey = yandexTranslationKey;
         }
-        public static string AnalyseEmotionText(string text)
+
+        public string AnalyseEmotionText(string text)
         {
             var textEnglish = TranslateToEnglish(text);
             var display = GetEmotionInEnglishText(textEnglish);
             return display;
         }
 
-        private static string TranslateToEnglish(string text)
+        private string TranslateToEnglish(string text)
         {
-            var keyYandexTranslation = ConfigurationManager.AppSettings["KeyYandexTranslation"];
-
+            // todo inject http client
             var url = "https://translate.yandex.net";
-            var client = new RestClient(url);
-            var request = new RestRequest("/api/v1.5/tr.json/translate", Method.POST);
-            request.AddParameter("key", keyYandexTranslation);
-            request.AddParameter("lang", "en");
-            request.AddParameter("text", text);
+            var client = new HttpClient();
+            var response = client.PostAsync(
+                "/api/v1.5/tr.json/translate",
+                new FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("key", _yandexTranslationKey),
+                    new KeyValuePair<string, string>("lang", "en"),
+                    new KeyValuePair<string, string>("text", text)
+                }))
+                .Result;
 
-            IRestResponse response = client.Execute(request);
+            var yandexAnswer = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content.ReadAsStringAsync().Result);
 
             var telemetryClient = new TelemetryClient();
             telemetryClient.TrackEvent("Translation Request", new Dictionary<string, string>
             {
                 {"request text", text},
-                {"response content", response.Content}
+                {"response content", yandexAnswer.text[0]}
             });
 
-            var yandexAnswerDto = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content);
-
-            return yandexAnswerDto.text[0];
+            return yandexAnswer.text[0];
         }
 
         private static string GetEmotionInEnglishText(string englishText)
         {
-            var ibmEmotionUsername = ConfigurationManager.AppSettings["IbmEmotionUsername"];
-            var ibmEmotionPassword = ConfigurationManager.AppSettings["IbmEmotionPassword"];
-
             var url = "https://gateway.watsonplatform.net";
             var client = new RestClient(url);
             client.Authenticator = new HttpBasicAuthenticator(ibmEmotionUsername, ibmEmotionPassword);
