@@ -114,13 +114,10 @@ namespace EmotionAnalyticsManagerBotFW.Controllers
                         ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
                         var answer = activity.CreateReply();
-                        answer.Attachments = new List<Attachment>();
-                        answer.Attachments.Add(new Attachment
+                        answer.Attachments = new List<Attachment>
                         {
-                            ContentUrl = imageUrl,
-                            ContentType = "image/jpeg",
-                            Name = " "
-                        });
+                            new Attachment {ContentUrl = imageUrl, ContentType = "image/jpeg", Name = " "}
+                        };
 
                         try
                         {

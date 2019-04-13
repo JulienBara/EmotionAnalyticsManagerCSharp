@@ -88,8 +88,7 @@ namespace EmotionAnalyticManagerCoreStandard
         {
             // todo check if there is a library or inject http client
             var url = "https://westus.api.cognitive.microsoft.com";
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(url);
+            HttpClient client = new HttpClient {BaseAddress = new Uri(url)};
             client.DefaultRequestHeaders.Add("Content-Type", "application/json");
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _azureCognitiveServicesKey);
 

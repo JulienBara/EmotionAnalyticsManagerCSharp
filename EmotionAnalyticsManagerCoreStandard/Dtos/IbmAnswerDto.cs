@@ -4,18 +4,18 @@ namespace EmotionAnalyticManagerCoreStandard.Dtos
 {
     public class IbmAnswerDto
     {
-        public Dictionary<string,double> usage;
-        public string language;
-        public EmotionDto emotion;
+        public Dictionary<string,double> Usage { get; set; }
+        public string Language { get; set; }
+        public EmotionDto Emotion { get; set; }
     }
 
     public class EmotionDto
     {
-        public DocumentDto document;
+        public DocumentDto Document { get; set; }
     }
 
     public class DocumentDto
     {
-        public Dictionary<string,double> emotion;
+        public Dictionary<string,double> Emotion { get; set; }
     }
 }

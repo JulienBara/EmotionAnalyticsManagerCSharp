@@ -40,8 +40,7 @@ namespace EmotionAnalyticManagerCoreStandard
             // todo inject http client
             // todo check last version
             var url = "https://translate.yandex.net";
-            var client = new HttpClient();
-            client.BaseAddress = new Uri(url);
+            var client = new HttpClient { BaseAddress = new Uri(url) };
             var response = client.PostAsync(
                 "/api/v1.5/tr.json/translate",
                 new FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
@@ -69,8 +68,7 @@ namespace EmotionAnalyticManagerCoreStandard
             // todo inject http client
             // todo check last version
             var url = "https://gateway.watsonplatform.net";
-            var client = new HttpClient();
-            client.BaseAddress = new Uri(url);
+            var client = new HttpClient { BaseAddress = new Uri(url) };
             var byteArray = Encoding.ASCII.GetBytes($"{_ibmEmotionUsername}:{_ibmEmotionPassword}");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             client.DefaultRequestHeaders.Add("Content-Type", "application/json");
@@ -100,15 +98,16 @@ namespace EmotionAnalyticManagerCoreStandard
                 {"response content", response}
             });
 
-            var docEmotions = ibmAnswerDto.emotion.document.emotion;
+            var docEmotions = ibmAnswerDto.Emotion.Document.Emotion;
 
             var sum = docEmotions.Sum(x => x.Value);
 
-            var displayList = new List<string>();
+            var displayList = new List<string>
+            {
+                string.Format("{0} | {1}", Translation.Dictionary["emotion"], Translation.Dictionary["value"]),
+                "-|-"
+            };
 
-            displayList.Add(string.Format("{0} | {1}", Translation.Dictionary["emotion"],
-                Translation.Dictionary["value"]));
-            displayList.Add("-|-");
 
             foreach (var emotion in docEmotions)
             {
