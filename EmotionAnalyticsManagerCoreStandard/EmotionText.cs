@@ -1,0 +1,108 @@
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.ApplicationInsights;
+using Microsoft.Extensions.Configuration;
+
+namespace EmotionAnalyticManagerCore
+{
+    public class EmotionText
+    {
+
+        private readonly IConfiguration _configuration;
+
+        public EmotionText(IConfiguration configuration)
+        {
+            _configuration = configuration
+        }
+        public static string AnalyseEmotionText(string text)
+        {
+            var textEnglish = TranslateToEnglish(text);
+            var display = GetEmotionInEnglishText(textEnglish);
+            return display;
+        }
+
+        private static string TranslateToEnglish(string text)
+        {
+            var keyYandexTranslation = ConfigurationManager.AppSettings["KeyYandexTranslation"];
+
+            var url = "https://translate.yandex.net";
+            var client = new RestClient(url);
+            var request = new RestRequest("/api/v1.5/tr.json/translate", Method.POST);
+            request.AddParameter("key", keyYandexTranslation);
+            request.AddParameter("lang", "en");
+            request.AddParameter("text", text);
+
+            IRestResponse response = client.Execute(request);
+
+            var telemetryClient = new TelemetryClient();
+            telemetryClient.TrackEvent("Translation Request", new Dictionary<string, string>
+            {
+                {"request text", text},
+                {"response content", response.Content}
+            });
+
+            var yandexAnswerDto = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content);
+
+            return yandexAnswerDto.text[0];
+        }
+
+        private static string GetEmotionInEnglishText(string englishText)
+        {
+            var ibmEmotionUsername = ConfigurationManager.AppSettings["IbmEmotionUsername"];
+            var ibmEmotionPassword = ConfigurationManager.AppSettings["IbmEmotionPassword"];
+
+            var url = "https://gateway.watsonplatform.net";
+            var client = new RestClient(url);
+            client.Authenticator = new HttpBasicAuthenticator(ibmEmotionUsername, ibmEmotionPassword);
+
+            var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27",
+                Method.POST);
+            request.AddHeader("Content-Type", "application/json");
+
+            var body = new
+            {
+                text = englishText,
+                features = new
+                {
+                    emotion = new { }
+                }
+            };
+            request.AddJsonBody(body);
+
+            IRestResponse response = client.Execute(request);
+
+            var telemetryClient = new TelemetryClient();
+            telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
+            {
+                {"request text", englishText},
+                {"response content", response.Content}
+            });
+
+            var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
+
+            var docEmotions = ibmAnswerDto.emotion.document.emotion;
+
+            var sum = docEmotions.Sum(x => x.Value);
+
+            var translation = new Translation();
+
+            var displayList = new List<string>();
+
+            displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
+                translation.dictionary["value"]));
+            displayList.Add("-|-");
+
+            foreach (var emotion in docEmotions)
+            {
+                var emotionTranslated = translation.dictionary[emotion.Key];
+                var emotionValue = emotion.Value / sum;
+                displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
+            }
+
+            var display = string.Join("\n", displayList);
+
+            return display;
+        }
+    }
+}
