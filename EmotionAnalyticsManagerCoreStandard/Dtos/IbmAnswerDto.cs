@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 
-namespace EmotionAnalyticsManagerCore
+namespace EmotionAnalyticManagerCoreStandard.Dtos
 {
-    class IbmAnswerDto
+    public class IbmAnswerDto
     {
         public Dictionary<string,double> usage;
         public string language;
         public EmotionDto emotion;
     }
-    
-    class EmotionDto
+
+    public class EmotionDto
     {
         public DocumentDto document;
     }
-    
-    class DocumentDto
+
+    public class DocumentDto
     {
         public Dictionary<string,double> emotion;
     }

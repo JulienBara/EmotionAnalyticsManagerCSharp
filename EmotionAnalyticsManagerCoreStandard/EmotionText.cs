@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using EmotionAnalyticManagerCoreStandard.Dtos;
+using EmotionAnalyticManagerCoreStandard.Helpers;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
 
@@ -9,7 +15,7 @@ namespace EmotionAnalyticManagerCoreStandard
     {
         private readonly string _ibmEmotionUsername;
         private readonly string _ibmEmotionPassword;
-    
+
         private readonly string _yandexTranslationKey;
 
         public EmotionText(
@@ -32,8 +38,10 @@ namespace EmotionAnalyticManagerCoreStandard
         private string TranslateToEnglish(string text)
         {
             // todo inject http client
+            // todo check last version
             var url = "https://translate.yandex.net";
             var client = new HttpClient();
+            client.BaseAddress = new Uri(url);
             var response = client.PostAsync(
                 "/api/v1.5/tr.json/translate",
                 new FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
@@ -56,15 +64,16 @@ namespace EmotionAnalyticManagerCoreStandard
             return yandexAnswer.text[0];
         }
 
-        private static string GetEmotionInEnglishText(string englishText)
+        private string GetEmotionInEnglishText(string englishText)
         {
+            // todo inject http client
+            // todo check last version
             var url = "https://gateway.watsonplatform.net";
-            var client = new RestClient(url);
-            client.Authenticator = new HttpBasicAuthenticator(ibmEmotionUsername, ibmEmotionPassword);
-
-            var request = new RestRequest("/natural-language-understanding/api/v1/analyze?version=2017-02-27",
-                Method.POST);
-            request.AddHeader("Content-Type", "application/json");
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(url);
+            var byteArray = Encoding.ASCII.GetBytes($"{_ibmEmotionUsername}:{_ibmEmotionPassword}");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
 
             var body = new
             {
@@ -74,34 +83,36 @@ namespace EmotionAnalyticManagerCoreStandard
                     emotion = new { }
                 }
             };
-            request.AddJsonBody(body);
 
-            IRestResponse response = client.Execute(request);
+            var request = client.PostAsync(
+                "/natural-language-understanding/api/v1/analyze?version=2017-02-27",
+                new StringContent(JsonConvert.SerializeObject(body)))
+                .Result;
+
+            var response = request.Content.ReadAsStringAsync().Result;
+
+            var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response);
 
             var telemetryClient = new TelemetryClient();
             telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
             {
                 {"request text", englishText},
-                {"response content", response.Content}
+                {"response content", response}
             });
-
-            var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response.Content);
 
             var docEmotions = ibmAnswerDto.emotion.document.emotion;
 
             var sum = docEmotions.Sum(x => x.Value);
 
-            var translation = new Translation();
-
             var displayList = new List<string>();
 
-            displayList.Add(string.Format("{0} | {1}", translation.dictionary["emotion"],
-                translation.dictionary["value"]));
+            displayList.Add(string.Format("{0} | {1}", Translation.Dictionary["emotion"],
+                Translation.Dictionary["value"]));
             displayList.Add("-|-");
 
             foreach (var emotion in docEmotions)
             {
-                var emotionTranslated = translation.dictionary[emotion.Key];
+                var emotionTranslated = Translation.Dictionary[emotion.Key];
                 var emotionValue = emotion.Value / sum;
                 displayList.Add(string.Format("{0} | {1,5:N2}", emotionTranslated, emotionValue));
             }

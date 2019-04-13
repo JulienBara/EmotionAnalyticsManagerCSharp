@@ -1,6 +1,6 @@
-﻿namespace EmotionAnalyticManagerCoreStandard
+﻿namespace EmotionAnalyticManagerCoreStandard.Dtos
 {
-    class YandexAnswerDto
+    public class YandexAnswerDto
     {
         public int code;
         public string lang;
