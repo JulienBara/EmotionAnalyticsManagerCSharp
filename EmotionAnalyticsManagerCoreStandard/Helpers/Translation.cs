@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EmotionAnalyticManagerCoreStandard.Helpers
+namespace EmotionAnalyticsManagerCoreStandard.Helpers
 {
     public static class Translation
     {

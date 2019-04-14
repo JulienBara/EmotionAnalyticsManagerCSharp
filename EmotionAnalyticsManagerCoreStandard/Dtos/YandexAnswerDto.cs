@@ -1,4 +1,4 @@
-﻿namespace EmotionAnalyticManagerCoreStandard.Dtos
+﻿namespace EmotionAnalyticsManagerCoreStandard.Dtos
 {
     public class YandexAnswerDto
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EmotionAnalyticManagerCoreStandard.Dtos
+namespace EmotionAnalyticsManagerCoreStandard.Dtos
 {
     public class IbmAnswerDto
     {

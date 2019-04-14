@@ -4,18 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using EmotionAnalyticManagerCoreStandard.Dtos;
-using EmotionAnalyticManagerCoreStandard.Helpers;
-using Microsoft.ApplicationInsights;
+using EmotionAnalyticsManagerCoreStandard.Dtos;
+using EmotionAnalyticsManagerCoreStandard.Helpers;
 using Newtonsoft.Json;
 
-namespace EmotionAnalyticManagerCoreStandard
+namespace EmotionAnalyticsManagerCoreStandard
 {
     public class EmotionText
     {
         private readonly string _ibmEmotionUsername;
         private readonly string _ibmEmotionPassword;
-
         private readonly string _yandexTranslationKey;
 
         public EmotionText(
@@ -53,13 +51,6 @@ namespace EmotionAnalyticManagerCoreStandard
 
             var yandexAnswer = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content.ReadAsStringAsync().Result);
 
-            var telemetryClient = new TelemetryClient();
-            telemetryClient.TrackEvent("Translation Request", new Dictionary<string, string>
-            {
-                {"request text", text},
-                {"response content", yandexAnswer.text[0]}
-            });
-
             return yandexAnswer.text[0];
         }
 
@@ -90,13 +81,6 @@ namespace EmotionAnalyticManagerCoreStandard
             var response = request.Content.ReadAsStringAsync().Result;
 
             var ibmAnswerDto = JsonConvert.DeserializeObject<IbmAnswerDto>(response);
-
-            var telemetryClient = new TelemetryClient();
-            telemetryClient.TrackEvent("Emotion Request", new Dictionary<string, string>
-            {
-                {"request text", englishText},
-                {"response content", response}
-            });
 
             var docEmotions = ibmAnswerDto.Emotion.Document.Emotion;
 

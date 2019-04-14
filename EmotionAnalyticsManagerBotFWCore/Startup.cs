@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using EmotionAnalyticManagerCoreStandard;
+using EmotionAnalyticsManagerCoreStandard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -15,10 +15,11 @@ namespace EmotionAnalyticsManagerBotFWCore
 {
     public class Startup
     {
+        private IConfiguration _configuration;
         private ILoggerFactory _loggerFactory;
         private readonly bool _isProduction;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             _isProduction = env.IsProduction();
             var builder = new ConfigurationBuilder()
@@ -26,12 +27,14 @@ namespace EmotionAnalyticsManagerBotFWCore
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
+            _configuration = configuration;
         }
 
-        public void ConfigureServices(IConfiguration configuration, IServiceCollection services)
+        public void ConfigureServices( IServiceCollection services)
         {
-            var secretKey = configuration.GetSection("botFileSecret")?.Value;
-            var botFilePath = configuration.GetSection("botFilePath")?.Value;
+            var secretKey = _configuration.GetSection("botFileSecret")?.Value;
+            var botFilePath = _configuration.GetSection("botFilePath")?.Value;
             if (!File.Exists(botFilePath))
             {
                 throw new FileNotFoundException($"The .bot configuration file was not found. botFilePath: {botFilePath}");
