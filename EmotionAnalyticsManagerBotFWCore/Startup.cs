@@ -65,7 +65,7 @@ namespace EmotionAnalyticsManagerBotFWCore
             {
                 // Attempt to load development environment
                 service = botConfig.Services.Where(s => s.Type == "endpoint" && s.Name == "development").FirstOrDefault();
-            }apply keys
+            }
 
             if (!(service is EndpointService endpointService))
             {
