@@ -31,7 +31,7 @@ namespace EmotionAnalyticsManagerBotFWCore
             _configuration = configuration;
         }
 
-        public void ConfigureServices( IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             var secretKey = _configuration.GetSection("botFileSecret")?.Value;
             var botFilePath = _configuration.GetSection("botFilePath")?.Value;
@@ -65,7 +65,7 @@ namespace EmotionAnalyticsManagerBotFWCore
             {
                 // Attempt to load development environment
                 service = botConfig.Services.Where(s => s.Type == "endpoint" && s.Name == "development").FirstOrDefault();
-            }
+            }apply keys
 
             if (!(service is EndpointService endpointService))
             {
@@ -74,7 +74,9 @@ namespace EmotionAnalyticsManagerBotFWCore
 
             services.AddBot<EmotionAnalyticsManagerBotFWCoreBot>(options =>
             {
-                options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
+                options.CredentialProvider = new SimpleCredentialProvider(
+                    _configuration.GetSection("MicrosoftAppId").Value,
+                    _configuration.GetSection("MicrosoftAppPassword").Value);
 
                 ILogger logger = _loggerFactory.CreateLogger<EmotionAnalyticsManagerBotFWCoreBot>();
 
@@ -85,8 +87,12 @@ namespace EmotionAnalyticsManagerBotFWCore
                 };
             });
 
-            services.AddScoped<EmotionPicture>(x => new EmotionPicture("azurecognitivekey"));
-            services.AddScoped<EmotionText>(x => new EmotionText("ibmuser","ibmpwd", "yandexkey"));
+            services.AddScoped<EmotionPicture>(x => new EmotionPicture(
+                _configuration.GetSection("KeyMicrosoftEmotion").Value));
+            services.AddScoped<EmotionText>(x => new EmotionText(
+                _configuration.GetSection("IbmEmotionUsername").Value,
+                _configuration.GetSection("IbmEmotionPassword").Value,
+                _configuration.GetSection("KeyYandexTranslation").Value));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
