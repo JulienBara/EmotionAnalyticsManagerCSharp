@@ -41,6 +41,9 @@ namespace EmotionAnalyticsManagerBotFWCore
             {
                 _ = Task.Run(() => EmotionImageAsync(turnContext));
             }
+
+            // acknowledge answer fast to prevent timeout / to make timeout less likely
+            await turnContext.SendActivityAsync("", cancellationToken: cancellationToken); 
         }
 
         private async void EmotionTextAsync(ITurnContext turnContext)
