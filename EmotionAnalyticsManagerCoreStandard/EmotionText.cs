@@ -62,7 +62,7 @@ namespace EmotionAnalyticsManagerCoreStandard
             var client = new HttpClient { BaseAddress = new Uri(url) };
             var byteArray = Encoding.ASCII.GetBytes($"{_ibmEmotionUsername}:{_ibmEmotionPassword}");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var body = new
             {
@@ -74,8 +74,8 @@ namespace EmotionAnalyticsManagerCoreStandard
             };
 
             var request = client.PostAsync(
-                "/natural-language-understanding/api/v1/analyze?version=2017-02-27",
-                new StringContent(JsonConvert.SerializeObject(body)))
+                "/natural-language-understanding/api/v1/analyze?version=2018-11-16",
+                new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"))
                 .Result;
 
             var response = request.Content.ReadAsStringAsync().Result;
