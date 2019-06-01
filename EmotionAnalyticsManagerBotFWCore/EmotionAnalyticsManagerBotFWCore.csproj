@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <ApplicationInsightsResourceId>/subscriptions/fbe95eb8-81bc-44f5-9cd0-d06f31a8f9e7/resourcegroups/EmoEu/providers/microsoft.insights/components/EmoInsights</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/fbe95eb8-81bc-44f5-9cd0-d06f31a8f9e7/resourcegroups/EmoEu/providers/microsoft.insights/components/EmoInsights</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" />
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.4.4" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.4.4" />
@@ -21,5 +24,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EmotionAnalyticsManagerCoreStandard\EmotionAnalyticsManagerCoreStandard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 </Project>
