@@ -15,7 +15,7 @@ namespace EmotionAnalyticsManagerBotFWCore
 {
     public class Startup
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private ILoggerFactory _loggerFactory;
         private readonly bool _isProduction;
 

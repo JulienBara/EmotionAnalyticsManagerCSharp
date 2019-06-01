@@ -34,12 +34,12 @@ namespace EmotionAnalyticsManagerBotFWCore
         {
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                Task.Run(() => EmotionTextAsync(turnContext));
+                _ = Task.Run(() => EmotionTextAsync(turnContext));
             }
 
             if (turnContext.Activity.Attachments != null)
             {
-                Task.Run(() => EmotionImageAsync(turnContext));
+                _ = Task.Run(() => EmotionImageAsync(turnContext));
             }
         }
 
