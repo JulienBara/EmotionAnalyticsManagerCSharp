@@ -242,3 +242,4 @@ ModelManifest.xml
 .fake/
 EmotionAnalyticsManagerBotFW/Properties/PublishProfiles/Emo - Web Deploy.pubxml
 EmotionAnalyticsManagerBotFW/Properties/PublishProfiles/Emo - Web Deploy.pubxml
+/EmotionAnalyticsManagerBotFWCore/appsettings.Development.json
