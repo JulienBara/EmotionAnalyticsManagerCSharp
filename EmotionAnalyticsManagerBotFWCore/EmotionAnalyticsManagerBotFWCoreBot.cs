@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EmotionAnalyticsManagerCoreStandard;
+using Microsoft.ApplicationInsights;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
@@ -39,11 +40,22 @@ namespace EmotionAnalyticsManagerBotFWCore
 
             if (turnContext.Activity.Attachments != null)
             {
-                _ = Task.Run(() => EmotionImageAsync(turnContext));
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        EmotionImageAsync(turnContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        var telemetryClient = new TelemetryClient();
+                        telemetryClient.TrackException(ex);
+                    }
+                });
             }
 
             // acknowledge answer fast to prevent timeout / to make timeout less likely
-            await turnContext.SendActivityAsync("", cancellationToken: cancellationToken); 
+            await turnContext.SendActivityAsync("", cancellationToken: cancellationToken);
         }
 
         private async void EmotionTextAsync(ITurnContext turnContext)
@@ -64,7 +76,8 @@ namespace EmotionAnalyticsManagerBotFWCore
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while analyzing text");
+                var telemetryClient = new TelemetryClient();
+                telemetryClient.TrackException(ex);
             }
         }
 
