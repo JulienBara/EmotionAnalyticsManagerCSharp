@@ -95,7 +95,7 @@ namespace EmotionAnalyticsManagerBotFWCore
                 _configuration.GetSection("KeyYandexTranslation").Value));
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
 

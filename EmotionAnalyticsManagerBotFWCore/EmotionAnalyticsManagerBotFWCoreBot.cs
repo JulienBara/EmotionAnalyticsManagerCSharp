@@ -6,27 +6,18 @@ using EmotionAnalyticsManagerCoreStandard;
 using Microsoft.ApplicationInsights;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Logging;
 
 namespace EmotionAnalyticsManagerBotFWCore
 {
     public class EmotionAnalyticsManagerBotFWCoreBot : IBot
     {
-        private readonly ILogger _logger;
         private readonly EmotionPicture _emotionPictureService;
         private readonly EmotionText _emotionTextService;
 
         public EmotionAnalyticsManagerBotFWCoreBot(
-            ILoggerFactory loggerFactory,
             EmotionPicture emotionPicture,
             EmotionText emotionText)
         {
-            if (loggerFactory == null)
-            {
-                throw new System.ArgumentNullException(nameof(loggerFactory));
-            }
-
-            _logger = loggerFactory.CreateLogger<EmotionAnalyticsManagerBotFWCoreBot>();
             _emotionPictureService = emotionPicture ?? throw new System.ArgumentNullException(nameof(emotionPicture));
             _emotionTextService = emotionText ?? throw new System.ArgumentNullException(nameof(emotionText));
         }
@@ -35,12 +26,23 @@ namespace EmotionAnalyticsManagerBotFWCore
         {
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                _ = Task.Run(() => EmotionTextAsync(turnContext));
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        EmotionTextAsync(turnContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        var telemetryClient = new TelemetryClient();
+                        telemetryClient.TrackException(ex);
+                    }
+                });
             }
 
             if (turnContext.Activity.Attachments != null)
             {
-                _ = Task.Run(() =>
+                await Task.Run(() =>
                 {
                     try
                     {
@@ -66,16 +68,8 @@ namespace EmotionAnalyticsManagerBotFWCore
                 message = message.Substring(emoString.Length);
             }
 
-            try
-            {
-                var answer = _emotionTextService.AnalyseEmotionText(message);
-                await turnContext.SendActivityAsync(answer);
-            }
-            catch (Exception ex)
-            {
-                var telemetryClient = new TelemetryClient();
-                telemetryClient.TrackException(ex);
-            }
+            var answer = _emotionTextService.AnalyseEmotionText(message);
+            await turnContext.SendActivityAsync(answer);
         }
 
         private async void EmotionImageAsync(ITurnContext turnContext)

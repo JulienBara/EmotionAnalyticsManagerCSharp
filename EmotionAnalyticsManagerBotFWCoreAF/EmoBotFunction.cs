@@ -43,7 +43,6 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
         [FunctionName("EmoBot")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/messages")] HttpRequest req,
-            ILogger log,
             CancellationToken token)
         {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
