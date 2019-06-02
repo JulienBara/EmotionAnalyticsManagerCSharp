@@ -100,7 +100,9 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             }
 
             var answer = _emotionTextService.AnalyseEmotionText(message);
-            await turnContext.SendActivityAsync(answer);
+
+            if(!string.IsNullOrWhiteSpace(answer))
+                await turnContext.SendActivityAsync(answer);
         }
 
         private static async void EmotionImageAsync(ITurnContext turnContext)

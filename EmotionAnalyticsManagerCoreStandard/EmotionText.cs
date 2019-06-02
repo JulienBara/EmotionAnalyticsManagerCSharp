@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using EmotionAnalyticsManagerCoreStandard.Dtos;
 using EmotionAnalyticsManagerCoreStandard.Helpers;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Newtonsoft.Json;
 
 namespace EmotionAnalyticsManagerCoreStandard
@@ -77,6 +79,13 @@ namespace EmotionAnalyticsManagerCoreStandard
                 "/natural-language-understanding/api/v1/analyze?version=2018-11-16",
                 new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"))
                 .Result;
+
+            if (!request.IsSuccessStatusCode)
+            {
+                var telemetryClient = new TelemetryClient();
+                telemetryClient.TrackException(new ExceptionTelemetry());
+                return "";
+            }
 
             var response = request.Content.ReadAsStringAsync().Result;
 
