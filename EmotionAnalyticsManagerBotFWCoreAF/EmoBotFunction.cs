@@ -45,6 +45,8 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "messages")] HttpRequest req,
             CancellationToken token)
         {
+            var telemetryClient = new TelemetryClient();
+            telemetryClient.TrackTrace("authHeader: " + req.Headers[@"Authorization"].FirstOrDefault())
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var activity = JsonConvert.DeserializeObject<Activity>(requestBody);
             try
