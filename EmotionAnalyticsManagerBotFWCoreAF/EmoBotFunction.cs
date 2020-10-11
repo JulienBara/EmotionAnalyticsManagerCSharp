@@ -55,6 +55,8 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             }
             catch (Exception ex)
             {
+                var telemetryClient = new TelemetryClient();
+                telemetryClient.TrackException(ex);
                 return new ObjectResult(ex) { StatusCode = StatusCodes.Status500InternalServerError };
             }
         }
