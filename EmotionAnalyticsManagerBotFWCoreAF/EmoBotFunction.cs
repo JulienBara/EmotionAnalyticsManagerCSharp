@@ -46,7 +46,7 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             CancellationToken token)
         {
             var telemetryClient = new TelemetryClient();
-            telemetryClient.TrackTrace("authHeader: " + req.Headers[@"Authorization"].FirstOrDefault())
+            telemetryClient.TrackTrace("authHeader: " + req.Headers[@"Authorization"].FirstOrDefault());
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var activity = JsonConvert.DeserializeObject<Activity>(requestBody);
             try
@@ -57,7 +57,6 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             }
             catch (Exception ex)
             {
-                var telemetryClient = new TelemetryClient();
                 telemetryClient.TrackException(ex);
                 return new ObjectResult(ex) { StatusCode = StatusCodes.Status500InternalServerError };
             }
