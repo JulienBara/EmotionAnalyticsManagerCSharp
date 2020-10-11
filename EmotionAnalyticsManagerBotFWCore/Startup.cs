@@ -91,8 +91,7 @@ namespace EmotionAnalyticsManagerBotFWCore
                 _configuration.GetSection("KeyMicrosoftEmotion").Value));
             services.AddScoped<EmotionText>(x => new EmotionText(
                 _configuration.GetSection("IbmEmotionUsername").Value,
-                _configuration.GetSection("IbmEmotionPassword").Value,
-                _configuration.GetSection("KeyYandexTranslation").Value));
+                _configuration.GetSection("IbmEmotionPassword").Value));
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

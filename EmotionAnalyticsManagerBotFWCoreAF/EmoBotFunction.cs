@@ -32,8 +32,7 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
 
             var ibmEmotionUsername = Environment.GetEnvironmentVariable("IbmEmotionUsername");
             var ibmEmotionPassword = Environment.GetEnvironmentVariable("IbmEmotionPassword");
-            var yandexTranslationKey = Environment.GetEnvironmentVariable("KeyYandexTranslation");
-            _emotionTextService = new EmotionText(ibmEmotionUsername, ibmEmotionPassword, yandexTranslationKey);
+            _emotionTextService = new EmotionText(ibmEmotionUsername, ibmEmotionPassword);
 
             var azureCognitiveServicesKey = Environment.GetEnvironmentVariable("KeyMicrosoftEmotion");
             _emotionPictureService = new EmotionPicture(azureCognitiveServicesKey);

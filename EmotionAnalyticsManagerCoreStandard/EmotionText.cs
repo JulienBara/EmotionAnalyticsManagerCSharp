@@ -16,44 +16,19 @@ namespace EmotionAnalyticsManagerCoreStandard
     {
         private readonly string _ibmEmotionUsername;
         private readonly string _ibmEmotionPassword;
-        private readonly string _yandexTranslationKey;
 
         public EmotionText(
             string ibmEmotionUsername,
-            string ibmEmotionPassword,
-            string yandexTranslationKey)
+            string ibmEmotionPassword)
         {
             _ibmEmotionUsername = ibmEmotionUsername;
             _ibmEmotionPassword = ibmEmotionPassword;
-            _yandexTranslationKey = yandexTranslationKey;
         }
 
         public string AnalyseEmotionText(string text)
         {
-            var textEnglish = TranslateToEnglish(text);
-            var display = GetEmotionInEnglishText(textEnglish);
+            var display = GetEmotionInEnglishText(text);
             return display;
-        }
-
-        private string TranslateToEnglish(string text)
-        {
-            // todo inject http client
-            // todo check last version
-            var url = "https://translate.yandex.net";
-            var client = new HttpClient { BaseAddress = new Uri(url) };
-            var response = client.PostAsync(
-                "/api/v1.5/tr.json/translate",
-                new FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
-                {
-                    new KeyValuePair<string, string>("key", _yandexTranslationKey),
-                    new KeyValuePair<string, string>("lang", "en"),
-                    new KeyValuePair<string, string>("text", text)
-                }))
-                .Result;
-
-            var yandexAnswer = JsonConvert.DeserializeObject<YandexAnswerDto>(response.Content.ReadAsStringAsync().Result);
-
-            return yandexAnswer.text[0];
         }
 
         private string GetEmotionInEnglishText(string englishText)
