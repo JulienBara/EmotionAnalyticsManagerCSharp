@@ -6,13 +6,13 @@ namespace EmotionAnalyticsManagerCoreStandard.Helpers
     {
         public static readonly Dictionary<string, string> Dictionary = new Dictionary<string, string>
         {
-            {"anger", "Colère"},
-            {"disgust", "Dégout"},
-            {"fear", "Peur"},
-            {"joy", "Joie"},
-            {"sadness", "Tristesse"},
-            {"emotion", "Emotion"},
-            {"value", "Valeur"}
+            {"Anger", "Colère"},
+            {"Disgust", "Dégout"},
+            {"Fear", "Peur"},
+            {"Joy", "Joie"},
+            {"Sadness", "Tristesse"},
+            {"Emotion", "Emotion"},
+            {"Value", "Valeur"}
         };
     }
 }
