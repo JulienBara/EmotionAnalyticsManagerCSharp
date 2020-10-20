@@ -30,9 +30,11 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             var credentialManager = new SimpleCredentialProvider(appId, pwd);
             _botAdapter = new BotFrameworkAdapter(credentialManager);
 
+            var microsoftTranslatorKey = Environment.GetEnvironmentVariable("MicrosoftTranslatorKey");
+            var microsoftTranslatorRegion = Environment.GetEnvironmentVariable("MicrosoftTranslatorRegion");
             var ibmApiKey = Environment.GetEnvironmentVariable("IbmApiKey");
             var ibmUrl = Environment.GetEnvironmentVariable("IbmUrl");
-            _emotionTextService = new EmotionText(ibmApiKey, ibmUrl);
+            _emotionTextService = new EmotionText(microsoftTranslatorKey, microsoftTranslatorRegion, ibmApiKey, ibmUrl);
 
             var azureCognitiveServicesKey = Environment.GetEnvironmentVariable("KeyMicrosoftEmotion");
             _emotionPictureService = new EmotionPicture(azureCognitiveServicesKey);
