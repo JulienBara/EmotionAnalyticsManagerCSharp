@@ -100,9 +100,11 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
                 message = message.Substring(emoString.Length);
             }
 
+            if (string.IsNullOrWhiteSpace(message)) return;
+
             var answer = _emotionTextService.AnalyseEmotionText(message);
 
-            if(!string.IsNullOrWhiteSpace(answer))
+            if (!string.IsNullOrWhiteSpace(answer))
                 await turnContext.SendActivityAsync(answer);
         }
 
