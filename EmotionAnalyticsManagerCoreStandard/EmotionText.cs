@@ -37,6 +37,8 @@ namespace EmotionAnalyticsManagerCoreStandard
         public string AnalyseEmotionText(string text)
         {
             var englishText = Task.Run(() => TranslateText(text)).Result;
+            if (string.IsNullOrWhiteSpace(englishText)) { return ""; }
+
             var display = GetEmotionInEnglishText(englishText);
             return display;
         }
