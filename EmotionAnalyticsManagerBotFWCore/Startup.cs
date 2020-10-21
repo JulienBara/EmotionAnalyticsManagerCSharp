@@ -88,7 +88,8 @@ namespace EmotionAnalyticsManagerBotFWCore
             });
 
             services.AddScoped<EmotionPicture>(x => new EmotionPicture(
-                _configuration.GetSection("KeyMicrosoftEmotion").Value));
+                _configuration.GetSection("MicrosoftCognitiveServicesEndpoint").Value,
+                _configuration.GetSection("MicrosoftCognitiveServicesKey").Value));
             services.AddScoped<EmotionText>(x => new EmotionText(
                 _configuration.GetSection("MicrosoftTranslatorKey").Value,
                 _configuration.GetSection("MicrosoftTranslatorRegion").Value,

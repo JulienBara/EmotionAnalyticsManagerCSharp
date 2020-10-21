@@ -36,8 +36,9 @@ namespace EmotionAnalyticsManagerBotFWCoreAF
             var ibmUrl = Environment.GetEnvironmentVariable("IbmUrl");
             _emotionTextService = new EmotionText(microsoftTranslatorKey, microsoftTranslatorRegion, ibmApiKey, ibmUrl);
 
-            var azureCognitiveServicesKey = Environment.GetEnvironmentVariable("KeyMicrosoftEmotion");
-            _emotionPictureService = new EmotionPicture(azureCognitiveServicesKey);
+            var azureCognitiveServicesEndpoint = Environment.GetEnvironmentVariable("MicrosoftCognitiveServicesEndpoint");
+            var azureCognitiveServicesKey = Environment.GetEnvironmentVariable("MicrosoftCognitiveServicesKey");
+            _emotionPictureService = new EmotionPicture(azureCognitiveServicesEndpoint, azureCognitiveServicesKey);
         }
 
         [FunctionName("EmoBot")]

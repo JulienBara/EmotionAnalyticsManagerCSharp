@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EmotionAnalyticsManagerCoreStandard.Dtos;
-using Newtonsoft.Json;
+using Microsoft.Azure.CognitiveServices.Vision.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -17,22 +16,26 @@ namespace EmotionAnalyticsManagerCoreStandard
 {
     public class EmotionPicture
     {
+        private readonly string _azureCognitiveServicesEndpoint;
         private readonly string _azureCognitiveServicesKey;
 
-        public EmotionPicture(string azureCognitiveServicesKey)
+        public EmotionPicture(
+            string azureCognitiveServicesEndpoint,
+            string azureCognitiveServicesKey)
         {
+            _azureCognitiveServicesEndpoint = azureCognitiveServicesEndpoint;
             _azureCognitiveServicesKey = azureCognitiveServicesKey;
         }
 
         public string AnalyzeEmotionPicture(string imageUrl)
         {
-            var emotionsTask = Task.Run(() => GetEmotionOfThePicture(imageUrl));
+            var detectedFacesTask = Task.Run(() => GetEmotionOfThePicture(imageUrl));
             var imageTask = Task.Run(() => DownloadPictureAsync(imageUrl));
 
-            var emotions = emotionsTask.Result;
+            var detectedFaces = detectedFacesTask.Result;
             var image = imageTask.Result;
-            if (emotions.Count == 0) return null; // no faces
-            var imageEmotions = DrawEmotion(emotions, image);
+            if (detectedFaces.Count == 0) return null; // no faces
+            var imageEmotions = DrawEmotion(detectedFaces, image);
             var imageUrlAnswer = UrlifyImage(imageEmotions);
             return imageUrlAnswer;
         }
@@ -53,7 +56,7 @@ namespace EmotionAnalyticsManagerCoreStandard
             }
         }
 
-        private byte[] DrawEmotion(List<MicrosoftEmotionAnswerFaceDto> emotions, byte[] imageBytes)
+        private byte[] DrawEmotion(IList<DetectedFace> detectedFaces, byte[] imageBytes)
         {
             using (Image<Rgba32> image = Image.Load(imageBytes))
             {
@@ -64,18 +67,18 @@ namespace EmotionAnalyticsManagerCoreStandard
                 // by deployment basis.
                 var font = SystemFonts.CreateFont("Arial", (float)image.Height / 20, FontStyle.Regular);
 
-                foreach (var emotion in emotions)
+                foreach (var face in detectedFaces)
                 {
                     image.Mutate(x => x
                         .Draw(
                             Rgba32.Green,
                             image.Height / 100,
                             new Rectangle(
-                                emotion.faceRectangle.left,
-                                emotion.faceRectangle.top,
-                                emotion.faceRectangle.width,
-                                emotion.faceRectangle.height))
-                        .DrawText(GetMaxEmotion(emotion), font, Rgba32.Green, PointF.Empty));
+                                face.FaceRectangle.Left,
+                                face.FaceRectangle.Top,
+                                face.FaceRectangle.Width,
+                                face.FaceRectangle.Height))
+                        .DrawText(GetMaxEmotion(face), font, Rgba32.Green, PointF.Empty));
                 }
 
                 var imgAnswer = ImageToByteArray(image);
@@ -83,24 +86,16 @@ namespace EmotionAnalyticsManagerCoreStandard
             }
         }
 
-        private List<MicrosoftEmotionAnswerFaceDto> GetEmotionOfThePicture(string imageUrl)
+        private async Task<IList<DetectedFace>> GetEmotionOfThePicture(string imageUrl)
         {
-            // todo check if there is a library or inject http client
-            var url = "https://westus.api.cognitive.microsoft.com";
-            HttpClient client = new HttpClient {BaseAddress = new Uri(url)};
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _azureCognitiveServicesKey);
+            var client = new FaceClient(new ApiKeyServiceClientCredentials(_azureCognitiveServicesKey)) { Endpoint = _azureCognitiveServicesEndpoint };
+            var detectedFaces = await client.Face.DetectWithUrlAsync(
+                imageUrl,
+                returnFaceAttributes: new List<FaceAttributeType?> { FaceAttributeType.Emotion },
+                detectionModel: DetectionModel.Detection01,
+                recognitionModel: RecognitionModel.Recognition03);
 
-            var response = client.PostAsync(
-                @"/face/v1.0/detect?returnFaceAttributes=emotion", 
-                new StringContent(JsonConvert.SerializeObject(new { url = imageUrl })))
-                .Result;
-
-            if (response.StatusCode != HttpStatusCode.OK) return new List<MicrosoftEmotionAnswerFaceDto>();
-
-            var emotions = JsonConvert.DeserializeObject<List<MicrosoftEmotionAnswerFaceDto>>(response.Content.ReadAsStringAsync().Result);
-
-            return emotions;
+            return detectedFaces;
         }
 
         private string UrlifyImage(byte[] image)
@@ -118,10 +113,12 @@ namespace EmotionAnalyticsManagerCoreStandard
             }
         }
 
-        private string GetMaxEmotion(MicrosoftEmotionAnswerFaceDto emotion)
+        private string GetMaxEmotion(DetectedFace face)
         {
-            var maxEmotions = emotion.faceAttributes.emotion.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotion.faceAttributes.emotion[maxEmotions]);
+            var emotions = face.FaceAttributes.Emotion;
+            var emotionsDictionnary = emotions.GetType().GetProperties().ToDictionary(x => x.Name, x => (double)x.GetValue(emotions));
+            var maxEmotions = emotionsDictionnary.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            var emotionString = maxEmotions + " : " + string.Format("{0:0.00}", emotionsDictionnary[maxEmotions]);
 
             return emotionString;
         }
